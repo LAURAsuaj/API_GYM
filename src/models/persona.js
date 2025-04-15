@@ -19,6 +19,12 @@ const personaSchema = mongoose.Schema({
   fechaIngreso: {
     type: Date,
     default: Date.now,
-  }
+  },
+  documento: {
+    type: String,
+    require:true,
+    unique: true
+  },
+
 });
 module.exports = mongoose.model("Persona", personaSchema);
