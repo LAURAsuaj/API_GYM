@@ -19,14 +19,24 @@ router.get("/personas", (req, res) => {
         .catch((error) => res.json({ message: error }));
 });
 
-//planes pertenecientes
-router.get("/planes/persona/:idPersona", async (req, res) => {
+    //plan al que pertenece y la fecha de vencimiento
+  router.get("/planes/persona/:idPersona", async (req, res) => {
     const { idPersona } = req.params;
     try {
       const planes = await planesSchema.find({ personas: idPersona }).populate('personas');
-      res.json(planes);
+  
+      const persona = planes[0].personas.find(p => p._id.toString() === idPersona); 
+  
+      const fechaIngreso = new Date(persona.fechaIngreso);
+      const fechaVencimiento = new Date(fechaIngreso);
+      fechaVencimiento.setDate(fechaIngreso.getDate() + 31);
+
+      res.json({
+        planes,
+        fechaVencimiento: fechaVencimiento.toISOString().split('T')[0] 
+      });
     } catch (error) {
-      console.error("ERROR REAL:", error); 
+      console.error("ERROR REAL:", error);
       res.status(500).json({ mensaje: "Error consultando planes", error });
     }
   });
