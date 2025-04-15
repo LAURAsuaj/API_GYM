@@ -22,8 +22,7 @@ const personaSchema = mongoose.Schema({
   },
   documento: {
     type: String,
-    require:true,
-    unique: true
+    required:true,
   },
 
 });
