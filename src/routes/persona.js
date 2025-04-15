@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router(); //manejador de rutas de express
 const personaSchema = require("../models/persona");
+const planesSchema = require("../models/planes");
 
 //Nueva persona
 router.post("/personas", (req, res) => {
@@ -17,6 +18,18 @@ router.get("/personas", (req, res) => {
         .then((data) => res.json(data))
         .catch((error) => res.json({ message: error }));
 });
+
+//planes pertenecientes
+router.get("/planes/persona/:idPersona", async (req, res) => {
+    const { idPersona } = req.params;
+    try {
+      const planes = await planesSchema.find({ personas: idPersona }).populate('personas');
+      res.json(planes);
+    } catch (error) {
+      console.error("ERROR REAL:", error); 
+      res.status(500).json({ mensaje: "Error consultando planes", error });
+    }
+  });
 
 //Consultar una persona por su id
 router.get("/personas/:id", (req, res) => {
