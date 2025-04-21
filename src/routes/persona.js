@@ -4,13 +4,39 @@ const router = express.Router(); //manejador de rutas de express
 const personaSchema = require("../models/persona");
 const planesSchema = require("../models/planes");
 
-//Nueva persona
-router.post("/personas", (req, res) => {
-    const persona = personaSchema(req.body);
-    persona
-        .save()
-        .then((data) => res.json(data))
-        .catch((error) => res.json({ message: error }));
+// Crear una nueva persona y asignarla directamente a un plan
+router.post("/planes/:planId/personas", async (req, res) => {
+    try {
+        const { planId } = req.params;
+        
+        // Verificar que el plan existe
+        const plan = await planesSchema.findById(planId);
+        if (!plan) {
+            return res.status(404).json({ mensaje: "Plan no encontrado" });
+        }
+        
+        // Crear la nueva persona
+        const persona = new personaSchema({
+            ...req.body,
+            fechaIngreso: new Date()
+        });
+        const nuevaPersona = await persona.save();
+        
+        // Asignar la persona al plan
+        plan.personas.push(nuevaPersona._id);
+        await plan.save();
+        
+        res.status(201).json({
+            mensaje: "Persona creada y asignada al plan con éxito",
+            persona: nuevaPersona,
+            plan: {
+                id: plan._id,
+                nombreP: plan.nombreP
+            }
+        });
+    } catch (error) {
+        res.status(500).json({ mensaje: "Error al crear y asignar persona", error: error.message });
+    }
 });
 
 //Consultar todas las personas
