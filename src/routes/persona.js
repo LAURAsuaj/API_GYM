@@ -1,4 +1,5 @@
 const express = require("express");
+const verifyToken = require('./validar_token');
 const router = express.Router(); //manejador de rutas de express
 const personaSchema = require("../models/persona");
 const planesSchema = require("../models/planes");
@@ -13,7 +14,7 @@ router.post("/personas", (req, res) => {
 });
 
 //Consultar todas las personas
-router.get("/personas", (req, res) => {
+router.get("/personas", verifyToken ,(req, res) => {
     personaSchema.find()
         .then((data) => res.json(data))
         .catch((error) => res.json({ message: error }));
@@ -82,8 +83,6 @@ router.delete("/personas/:id", (req, res) => {
           res.json({ message: error });
         });
     });
-    
-    
 
 module.exports = router;
 
